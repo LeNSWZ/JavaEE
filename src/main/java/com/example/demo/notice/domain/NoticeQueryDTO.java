@@ -20,13 +20,59 @@ public class NoticeQueryDTO{
 	
 
 	private String noticeNumber;
-
+	
+	private String title;
+	
+	private String type;
+	
+	private String content;
+	
+	private String userId;
+	
 	@DateTimeFormat(pattern="yyyy/MM/dd")  
 	private Date createTimeStart;
 	
 	@DateTimeFormat(pattern="yyyy/MM/dd")  
 	private Date createTimeEnd;
 	
+	
+	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public void setNoticeNumber(String noticeNumber) {
+		this.noticeNumber = noticeNumber;
+	}
+
 	public String getNoticeNumber() {
 		return noticeNumber;
 	}
@@ -60,6 +106,18 @@ public class NoticeQueryDTO{
 				if (StringUtils.isNotBlank(noticeQueryDTO.getNoticeNumber())) {
 					predicate.add(criteriaBuilder.like(root.get("noticeNumber").as(String.class),
 							"%" + noticeQueryDTO.getNoticeNumber() + "%"));
+				}
+				if (StringUtils.isNotBlank(noticeQueryDTO.getType())) {
+					predicate.add(criteriaBuilder.like(root.get("type").as(String.class),
+							"%" + noticeQueryDTO.getType() + "%"));
+				}
+				if (StringUtils.isNotBlank(noticeQueryDTO.getTitle())) {
+					predicate.add(criteriaBuilder.like(root.get("title").as(String.class),
+							"%" + noticeQueryDTO.getTitle() + "%"));
+				}
+				if (StringUtils.isNotBlank(noticeQueryDTO.getUserId())) {
+					predicate.add(criteriaBuilder.like(root.get("userId").as(String.class),
+							"%" + noticeQueryDTO.getUserId() + "%"));
 				}
 				if (null!=noticeQueryDTO.getCreateTimeStart()) {
 					predicate.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createTime").as(Date.class),

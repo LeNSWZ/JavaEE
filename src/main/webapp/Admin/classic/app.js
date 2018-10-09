@@ -84093,21 +84093,35 @@ Ext.define('Admin.view.notice.NoticeViewController', {extend:Ext.app.ViewControl
   var record = store.getById(values.id);
   record.set(values);
   win.close();
-}, quickSearch:function(btn) {
-  var searchField = this.lookupReference('searchFieldName').getValue();
-  var searchValue = this.lookupReference('searchFieldValue').getValue();
-  var searchDataFieldValue = this.lookupReference('searchDataFieldValue').getValue();
-  var searchDataFieldValue2 = this.lookupReference('searchDataFieldValue2').getValue();
-  var store = btn.up('gridpanel').getStore();
-  Ext.apply(store.proxy.extraParams, {noticeNumber:'', createTimeStart:'', createTimeEnd:''});
-  if (searchField === 'noticeNumber') {
-    Ext.apply(store.proxy.extraParams, {noticeNumber:searchValue});
-  }
-  if (searchField === 'createTime') {
-    Ext.apply(store.proxy.extraParams, {createTimeStart:Ext.util.Format.date(searchDataFieldValue, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(searchDataFieldValue2, 'Y/m/d')});
-  }
-  store.load({params:{start:0, limit:20, page:1}});
-}, openSearchWindow:function(toolbar, rowIndex, colIndex) {
+}, 	quickSearch:function(btn){
+	var searchField = this.lookupReference('searchFieldName').getValue();
+	var searchValue = this.lookupReference('searchFieldValue').getValue();
+	var searchDataFieldValue = this.lookupReference('searchDataFieldValue').getValue();
+	var searchDataFieldValue2 = this.lookupReference('searchDataFieldValue2').getValue();
+	var store =	btn.up('gridpanel').getStore();
+	//var store = Ext.getCmp('userGridPanel').getStore();// Ext.getCmp(）需要在OrderPanel设置id属性
+	Ext.apply(store.proxy.extraParams, {noticeNumber:"",title:"",type:"",userId:"",createTimeStart:"",createTimeEnd:""});
+	
+	if(searchField==='noticeNumber'){
+		Ext.apply(store.proxy.extraParams,{noticeNumber:searchValue});
+	}
+	if(searchField==='title'){
+		Ext.apply(store.proxy.extraParams,{title:searchValue});
+	}	
+	if(searchField==='type'){
+		Ext.apply(store.proxy.extraParams,{type:searchValue});
+	}
+	if(searchField==='userId'){
+		Ext.apply(store.proxy.extraParams,{userId:searchValue});
+	}
+	if(searchField==='createTime'){
+		Ext.apply(store.proxy.extraParams,{
+			createTimeStart:Ext.util.Format.date(searchDataFieldValue, 'Y/m/d'),
+			createTimeEnd:Ext.util.Format.date(searchDataFieldValue2, 'Y/m/d')
+		});
+	}
+	store.load({params:{start:0, limit:20, page:1}});
+},openSearchWindow:function(toolbar, rowIndex, colIndex) {
   toolbar.up('grid').up('container').add(Ext.widget('noticeSearchWindow')).show();
 }, submitSearchForm:function(btn) {
   var store = Ext.data.StoreManager.lookup('noticeGridStore');
