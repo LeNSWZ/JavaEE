@@ -30,43 +30,51 @@ public class NoticeController {
 	@GetMapping
 	public Page<Notice> getPage(NoticeQueryDTO noticeQueryDTO , ExtjsPageRequest pageRequest) 
 	{
-		return noticeService.findAll(null, pageRequest.getPageable());
+		return noticeService.findAll(NoticeQueryDTO.getWhereClause(noticeQueryDTO), pageRequest.getPageable());
+	}
+	
+	@GetMapping(value="{id}")
+	public Notice getOne(@PathVariable("id") Long id) 
+	{
+		return noticeService.findById(id).get();
 	}
 	
 	@PutMapping(value="{id}",consumes=MediaType.APPLICATION_JSON_VALUE)
-	public String update(@PathVariable("id") Long myId,@RequestBody Notice dto) 
+	public ExtAjaxResponse update(@PathVariable("id") Long myId,@RequestBody Notice dto) 
 	{
 		try {
 			Notice entity = noticeService.findById(myId).get();
-			BeanUtils.copyProperties(dto, entity);//使用自定义的BeanUtils
-			noticeService.save(entity);
-			return "success:true";
+			if(entity!=null) {
+				BeanUtils.copyProperties(dto, entity);//使用自定义的BeanUtils
+				noticeService.save(entity);
+			}
+			return new ExtAjaxResponse(true,"更新成功！");
 		} catch (Exception e) {
-			return "success:false";
-		}
-	}	
-	
-	@PostMapping(consumes=MediaType.APPLICATION_JSON_VALUE)
-	public String save(@RequestBody Notice notice) 
-	{
-		try {
-			noticeService.save(notice);
-			return "success:true";
-		} catch (Exception e) {
-			return "success:false";
+			return new ExtAjaxResponse(true,"更新失败！");
 		}
 	}
 	
+	@PostMapping(consumes=MediaType.APPLICATION_JSON_VALUE)
+	public ExtAjaxResponse save(@RequestBody Notice notice) 
+	{
+		try {
+			noticeService.save(notice);
+			return new ExtAjaxResponse(true,"保存成功！");
+		} catch (Exception e) {
+			return new ExtAjaxResponse(true,"保存失败！");
+		}
+	}	
+	
 	@DeleteMapping(value="{id}")
-	public String delete(@PathVariable("id") Long id) 
+	public ExtAjaxResponse delete(@PathVariable("id") Long id) 
 	{
 		try {
 			if(id!=null) {
 				noticeService.deleteById(id);
 			}
-			return "success:true";
+			return new ExtAjaxResponse(true,"删除成功！");
 		} catch (Exception e) {
-			return "success:false";
+			return new ExtAjaxResponse(true,"删除失败！");
 		}
 	}
 	
@@ -82,6 +90,5 @@ public class NoticeController {
 			return new ExtAjaxResponse(true,"批量删除失败！");
 		}
 	}
-	
 	
 }
