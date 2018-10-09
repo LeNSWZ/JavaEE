@@ -83918,11 +83918,11 @@ Ext.define('Ext.ux.layout.ResponsiveColumn', {extend:Ext.layout.container.Auto, 
   }
 });
 Ext.define('Admin.model.Base', {extend:Ext.data.Model, schema:{namespace:'Admin.model'}});
-Ext.define('Admin.model.notice.NoticeModel', {extend:Admin.model.Base, fields:[{type:'int', name:'id'}, {type:'string', name:'noticeNumber'}, {type:'string', name:'title'}, {type:'string', name:'type'}, {type:'string', name:'content'}, {type:'string', name:'userId'}, {type:'date', name:'createTime', dateFormat:'Y/m/d'}, {type:'boolean', name:'isActive'}], proxy:{type:'rest', url:'/notice'}});
+Ext.define('Admin.model.notice.NoticeModel', {extend:Admin.model.Base, fields:[{type:'int', name:'id'}, {type:'string', name:'noticeNumber'}, {type:'string', name:'title'}, {type:'string', name:'type'}, {type:'string', name:'content'}, {type:'string', name:'userId'}, {type:'date', name:'createTime', dateFormat:'Y/m/d'}], proxy:{type:'rest', url:'/notice'}});
 Ext.define('Admin.store.NavigationTree', {extend:Ext.data.TreeStore, storeId:'NavigationTree', fields:[{name:'text'}], root:{expanded:true, children:[{text:'Dashboard', iconCls:'x-fa fa-desktop', rowCls:'nav-tree-badge nav-tree-badge-new', viewType:'admindashboard', routeId:'dashboard', leaf:true}, {text:'订单管理模块', iconCls:'x-fa fa-address-card', viewType:'order', leaf:true}, {text:'公告管理模块', iconCls:'x-fa fa-newspaper-o', viewType:'notice', leaf:true}, {text:'新闻公告', iconCls:'x-fa  fa-newspaper-o', 
 viewType:'news', leaf:true}, {text:'薪酬管理模块', iconCls:'x-fa  fa-paw', viewType:'salary', leaf:true}]}});
-Ext.define('Admin.store.notice.NoticeGridStroe', {extend:Ext.data.Store, storeId:'noticeGridStore', alias:'store.noticeGridStroe', model:'Admin.model.notice.NoticeModel', proxy:{type:'rest', url:'/notice', reader:{type:'json', rootProperty:'content', totalPoperty:'totalElements'}, writer:{type:'json'}, simpleSortMode:true}, autoLoad:true, autoSync:true, remoteSort:true, pageSize:20, sorters:{direction:'DESC', property:'id'}});
-Ext.define('Admin.store.salary.SalaryGridStroe', {extend:Ext.data.Store, alias:'store.salaryGridStroe', fields:[{type:'int', name:'identifier'}, {type:'string', name:'user_id'}, {type:'string', name:'user_name'}, {type:'string', name:'department'}, {type:'string', name:'position'}, {type:'string', name:'basesalary'}, {type:'string', name:'meritpay'}, {type:'string', name:'monthlysalary'}, {type:'date', name:'date'}, {type:'boolean', name:'isActive'}], data:{'lists':[{'identifier':1, 'user_id':'001', 
+Ext.define('Admin.store.notice.NoticeGridStore', {extend:Ext.data.Store, storeId:'noticeGridStore', alias:'store.noticeGridStore', model:'Admin.model.notice.NoticeModel', proxy:{type:'rest', url:'/notice', reader:{type:'json', rootProperty:'content', totalPoperty:'totalElements'}, writer:{type:'json'}, simpleSortMode:true}, autoLoad:true, autoSync:true, remoteSort:true, pageSize:20, sorters:{direction:'DESC', property:'id'}});
+Ext.define('Admin.store.salary.SalaryGridStore', {extend:Ext.data.Store, alias:'store.salaryGridStore', fields:[{type:'int', name:'identifier'}, {type:'string', name:'user_id'}, {type:'string', name:'user_name'}, {type:'string', name:'department'}, {type:'string', name:'position'}, {type:'string', name:'basesalary'}, {type:'string', name:'meritpay'}, {type:'string', name:'monthlysalary'}, {type:'date', name:'date'}, {type:'boolean', name:'isActive'}], data:{'lists':[{'identifier':1, 'user_id':'001', 
 'user_name':'员工1', 'department':'部门1', 'position':'职位1', 'basesalary':'1000', 'meritpay':'1000', 'monthlysalary':'2000', 'date':'2018/09/16', 'isActive':true}, {'identifier':2, 'user_id':'002', 'user_name':'员工2', 'department':'部门2', 'position':'职位2', 'basesalary':'2000', 'meritpay':'2000', 'monthlysalary':'4000', 'date':'2018/09/16', 'isActive':true}, {'identifier':3, 'user_id':'003', 'user_name':'员工3', 'department':'部门3', 'position':'职位3', 'basesalary':'3000', 'meritpay':'3000', 'monthlysalary':'6000', 
 'date':'2018/09/16', 'isActive':true}, {'identifier':4, 'user_id':'004', 'user_name':'员工4', 'department':'部门4', 'position':'职位4', 'basesalary':'4000', 'meritpay':'4000', 'monthlysalary':'8000', 'date':'2018/09/16', 'isActive':true}, {'identifier':5, 'user_id':'005', 'user_name':'员工5', 'department':'部门5', 'position':'职位5', 'basesalary':'5000', 'meritpay':'5000', 'monthlysalary':'10000', 'date':'2018/09/16', 'isActive':true}]}, proxy:{type:'memory', reader:{type:'json', rootProperty:'lists'}}, autoLoad:'true', 
 sorters:{direction:'ASC', property:'identifier'}});
@@ -84077,7 +84077,7 @@ Ext.define('Admin.view.notice.NoticeViewController', {extend:Ext.app.ViewControl
   var values = form.getValues();
   record.set(values);
   record.save();
-  Ext.data.StoreManager.lookup('noticeGridStroe').load();
+  Ext.data.StoreManager.lookup('noticeGridStore').load();
   win.close();
 }, openEditWindow:function(grid, rowIndex, colIndex) {
   var record = grid.getStore().getAt(rowIndex);
@@ -84110,7 +84110,7 @@ Ext.define('Admin.view.notice.NoticeViewController', {extend:Ext.app.ViewControl
 }, openSearchWindow:function(toolbar, rowIndex, colIndex) {
   toolbar.up('grid').up('container').add(Ext.widget('noticeSearchWindow')).show();
 }, submitSearchForm:function(btn) {
-  var store = Ext.data.StoreManager.lookup('noticeGridStroe');
+  var store = Ext.data.StoreManager.lookup('noticeGridStore');
   var win = btn.up('window');
   var form = win.down('form');
   var values = form.getValues();
@@ -84166,7 +84166,7 @@ Ext.define('Admin.view.notice.NoticeViewController', {extend:Ext.app.ViewControl
     this.lookupReference('searchDataFieldValue2').hide();
   }
 }});
-Ext.define('Admin.view.notice.NoticeViewModel', {extend:Ext.app.ViewModel, alias:'viewmodel.noticeViewModel', stores:{noticeLists:{type:'noticeGridStroe'}}});
+Ext.define('Admin.view.notice.NoticeViewModel', {extend:Ext.app.ViewModel, alias:'viewmodel.noticeViewModel', stores:{noticeLists:{type:'noticeGridStore'}}});
 Ext.define('Admin.view.salary.Salary', {extend:Ext.container.Container, xtype:'salary', controller:'salaryViewController', viewModel:{type:'salaryViewModel'}, layout:'fit', items:[{xtype:'salaryPanel'}]});
 Ext.define('Admin.view.salary.SalaryPanel', {extend:Ext.panel.Panel, xtype:'salaryPanel', layout:'fit', items:[{xtype:'gridpanel', cls:'user-grid', title:'薪酬管理模块', bind:'{salaryLists}', scrollable:false, columns:[{xtype:'gridcolumn', width:40, dataIndex:'identifier', text:'#'}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'user_name', text:'员工姓名', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'user_id', text:'员工id', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'department', 
 text:'员工部门', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'position', text:'员工职位', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'basesalary', text:'基本工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'meritpay', text:'绩效工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'monthlysalary', text:'月度工资', flex:1}, {xtype:'datecolumn', cls:'content-column', width:120, dataIndex:'date', text:'日期', formatter:'date("Y/m/d")'}, {xtype:'actioncolumn', 
