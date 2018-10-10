@@ -83919,13 +83919,11 @@ Ext.define('Ext.ux.layout.ResponsiveColumn', {extend:Ext.layout.container.Auto, 
 });
 Ext.define('Admin.model.Base', {extend:Ext.data.Model, schema:{namespace:'Admin.model'}});
 Ext.define('Admin.model.notice.NoticeModel', {extend:Admin.model.Base, fields:[{type:'int', name:'id'}, {type:'string', name:'noticeNumber'}, {type:'string', name:'title'}, {type:'string', name:'type'}, {type:'string', name:'content'}, {type:'string', name:'userId'}, {type:'date', name:'createTime', dateFormat:'Y/m/d'}], proxy:{type:'rest', url:'/notice'}});
+Ext.define('Admin.model.salary.SalaryModel', {extend:Admin.model.Base, fields:[{type:'int', name:'id'}, {type:'string', name:'userId'}, {type:'string', name:'userName'}, {type:'string', name:'department'}, {type:'string', name:'position'}, {type:'string', name:'baseSalary'}, {type:'string', name:'meritPay'}, {type:'string', name:'monthlySalary'}, {type:'date', name:'createTime', dateFormat:'Y/m/d'}], proxy:{type:'rest', url:'/salary'}});
 Ext.define('Admin.store.NavigationTree', {extend:Ext.data.TreeStore, storeId:'NavigationTree', fields:[{name:'text'}], root:{expanded:true, children:[{text:'Dashboard', iconCls:'x-fa fa-desktop', rowCls:'nav-tree-badge nav-tree-badge-new', viewType:'admindashboard', routeId:'dashboard', leaf:true}, {text:'订单管理模块', iconCls:'x-fa fa-address-card', viewType:'order', leaf:true}, {text:'公告管理模块', iconCls:'x-fa fa-newspaper-o', viewType:'notice', leaf:true}, {text:'新闻公告', iconCls:'x-fa  fa-newspaper-o', 
-viewType:'news', leaf:true}, {text:'薪酬管理模块', iconCls:'x-fa  fa-paw', viewType:'salary', leaf:true}]}});
+viewType:'news', leaf:true}, {text:'薪酬管理模块', iconCls:'x-fa  fa-paw', children:[{text:'薪酬管理', iconCls:'x-fa  fa-paw', viewType:'salary', leaf:true}, {text:'查询薪酬', iconCls:'x-fa  fa-paw', viewType:'checksalary', leaf:true}]}]}});
 Ext.define('Admin.store.notice.NoticeGridStore', {extend:Ext.data.Store, storeId:'noticeGridStore', alias:'store.noticeGridStore', model:'Admin.model.notice.NoticeModel', proxy:{type:'rest', url:'/notice', reader:{type:'json', rootProperty:'content', totalPoperty:'totalElements'}, writer:{type:'json'}, simpleSortMode:true}, autoLoad:true, autoSync:true, remoteSort:true, pageSize:20, sorters:{direction:'DESC', property:'id'}});
-Ext.define('Admin.store.salary.SalaryGridStore', {extend:Ext.data.Store, alias:'store.salaryGridStore', fields:[{type:'int', name:'identifier'}, {type:'string', name:'user_id'}, {type:'string', name:'user_name'}, {type:'string', name:'department'}, {type:'string', name:'position'}, {type:'string', name:'basesalary'}, {type:'string', name:'meritpay'}, {type:'string', name:'monthlysalary'}, {type:'date', name:'date'}, {type:'boolean', name:'isActive'}], data:{'lists':[{'identifier':1, 'user_id':'001', 
-'user_name':'员工1', 'department':'部门1', 'position':'职位1', 'basesalary':'1000', 'meritpay':'1000', 'monthlysalary':'2000', 'date':'2018/09/16', 'isActive':true}, {'identifier':2, 'user_id':'002', 'user_name':'员工2', 'department':'部门2', 'position':'职位2', 'basesalary':'2000', 'meritpay':'2000', 'monthlysalary':'4000', 'date':'2018/09/16', 'isActive':true}, {'identifier':3, 'user_id':'003', 'user_name':'员工3', 'department':'部门3', 'position':'职位3', 'basesalary':'3000', 'meritpay':'3000', 'monthlysalary':'6000', 
-'date':'2018/09/16', 'isActive':true}, {'identifier':4, 'user_id':'004', 'user_name':'员工4', 'department':'部门4', 'position':'职位4', 'basesalary':'4000', 'meritpay':'4000', 'monthlysalary':'8000', 'date':'2018/09/16', 'isActive':true}, {'identifier':5, 'user_id':'005', 'user_name':'员工5', 'department':'部门5', 'position':'职位5', 'basesalary':'5000', 'meritpay':'5000', 'monthlysalary':'10000', 'date':'2018/09/16', 'isActive':true}]}, proxy:{type:'memory', reader:{type:'json', rootProperty:'lists'}}, autoLoad:'true', 
-sorters:{direction:'ASC', property:'identifier'}});
+Ext.define('Admin.store.salary.SalaryGridStore', {extend:Ext.data.Store, storeId:'salaryGridStore', alias:'store.salaryGridStore', model:'Admin.model.salary.SalaryModel', proxy:{type:'rest', url:'/salary', reader:{type:'json', rootProperty:'content', totalPoperty:'totalElements'}, writer:{type:'json'}, simpleSortMode:true}, autoLoad:true, autoSync:true, remoteSort:true, pageSize:20, sorters:{direction:'DESC', property:'id'}});
 Ext.define('Admin.view.dashboard.DashboardController', {extend:Ext.app.ViewController, alias:'controller.dashboard', onRefreshToggle:function(tool, e, owner) {
   var store, runner;
   if (tool.toggleValue) {
@@ -84040,7 +84038,7 @@ Ext.define('Admin.view.main.MainController', {extend:Ext.app.ViewController, ali
 Ext.define('Admin.view.main.MainModel', {extend:Ext.app.ViewModel, alias:'viewmodel.main', data:{currentView:null}});
 Ext.define('Admin.view.notice.Notice', {extend:Ext.container.Container, xtype:'notice', controller:'noticeViewController', viewModel:{type:'noticeViewModel'}, layout:'fit', items:[{xtype:'noticePanel'}]});
 Ext.define('Aria.view.notice.NoticeAddWindow', {extend:Ext.window.Window, alias:'widget.noticeAddWindow', minHeight:100, minWidth:300, scrollable:true, title:'新增公告', closable:true, constrain:true, defaultFocus:'textfield', modal:true, layout:'fit', items:[{xtype:'form', layout:'form', padding:'10px', ariaLabel:'Enter notice message', items:[{xtype:'textfield', fieldLabel:'id', name:'id', hidden:true, readOnly:true}, {xtype:'textfield', fieldLabel:'公告编号', name:'noticeNumber'}, {xtype:'textfield', 
-fieldLabel:'公告标题', name:'title'}, {xtype:'htmleditor', fieldLabel:'公告内容', name:'content'}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'datefield', fieldLabel:'Create Time', name:'createTime', format:'Y/m/d'}, {xtype:'radiogroup', fieldLabel:'类型', name:'type', hideLabels:false, layout:'hbox', items:[{boxLabel:'新闻\x26nbsp\x26nbsp\x26nbsp\x26nbsp', name:'type', inputValue:'news', checked:true}, {boxLabel:'通知', name:'type', inputValue:'notice'}]}]}], buttonAlign:'center', buttons:{dock:'bottom', 
+fieldLabel:'公告标题', name:'title'}, {xtype:'htmleditor', fieldLabel:'公告内容', name:'content'}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'datefield', fieldLabel:'创建时间', name:'createTime', format:'Y/m/d'}, {xtype:'radiogroup', fieldLabel:'类型', name:'type', hideLabels:false, layout:'hbox', items:[{boxLabel:'新闻\x26nbsp\x26nbsp\x26nbsp\x26nbsp', name:'type', inputValue:'news', checked:true}, {boxLabel:'通知', name:'type', inputValue:'notice'}]}]}], buttonAlign:'center', buttons:{dock:'bottom', 
 items:[{xtype:'button', text:'提交', handler:'submitAddForm'}, {xtype:'button', text:'重置', handler:function(btn) {
   btn.up('window').down('form').reset();
 }}, {xtype:'button', text:'关闭', handler:function(btn) {
@@ -84093,42 +84091,37 @@ Ext.define('Admin.view.notice.NoticeViewController', {extend:Ext.app.ViewControl
   var record = store.getById(values.id);
   record.set(values);
   win.close();
-}, 	quickSearch:function(btn){
-	var searchField = this.lookupReference('searchFieldName').getValue();
-	var searchValue = this.lookupReference('searchFieldValue').getValue();
-	var searchDataFieldValue = this.lookupReference('searchDataFieldValue').getValue();
-	var searchDataFieldValue2 = this.lookupReference('searchDataFieldValue2').getValue();
-	var store =	btn.up('gridpanel').getStore();
-	//var store = Ext.getCmp('userGridPanel').getStore();// Ext.getCmp(）需要在OrderPanel设置id属性
-	Ext.apply(store.proxy.extraParams, {noticeNumber:"",title:"",type:"",userId:"",createTimeStart:"",createTimeEnd:""});
-	
-	if(searchField==='noticeNumber'){
-		Ext.apply(store.proxy.extraParams,{noticeNumber:searchValue});
-	}
-	if(searchField==='title'){
-		Ext.apply(store.proxy.extraParams,{title:searchValue});
-	}	
-	if(searchField==='type'){
-		Ext.apply(store.proxy.extraParams,{type:searchValue});
-	}
-	if(searchField==='userId'){
-		Ext.apply(store.proxy.extraParams,{userId:searchValue});
-	}
-	if(searchField==='createTime'){
-		Ext.apply(store.proxy.extraParams,{
-			createTimeStart:Ext.util.Format.date(searchDataFieldValue, 'Y/m/d'),
-			createTimeEnd:Ext.util.Format.date(searchDataFieldValue2, 'Y/m/d')
-		});
-	}
-	store.load({params:{start:0, limit:20, page:1}});
-},openSearchWindow:function(toolbar, rowIndex, colIndex) {
+}, quickSearch:function(btn) {
+  var searchField = this.lookupReference('searchFieldName').getValue();
+  var searchValue = this.lookupReference('searchFieldValue').getValue();
+  var searchDataFieldValue = this.lookupReference('searchDataFieldValue').getValue();
+  var searchDataFieldValue2 = this.lookupReference('searchDataFieldValue2').getValue();
+  var store = btn.up('gridpanel').getStore();
+  Ext.apply(store.proxy.extraParams, {noticeNumber:'', title:'', type:'', userId:'', createTimeStart:'', createTimeEnd:''});
+  if (searchField === 'noticeNumber') {
+    Ext.apply(store.proxy.extraParams, {noticeNumber:searchValue});
+  }
+  if (searchField === 'title') {
+    Ext.apply(store.proxy.extraParams, {title:searchValue});
+  }
+  if (searchField === 'type') {
+    Ext.apply(store.proxy.extraParams, {type:searchValue});
+  }
+  if (searchField === 'userId') {
+    Ext.apply(store.proxy.extraParams, {userId:searchValue});
+  }
+  if (searchField === 'createTime') {
+    Ext.apply(store.proxy.extraParams, {createTimeStart:Ext.util.Format.date(searchDataFieldValue, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(searchDataFieldValue2, 'Y/m/d')});
+  }
+  store.load({params:{start:0, limit:20, page:1}});
+}, openSearchWindow:function(toolbar, rowIndex, colIndex) {
   toolbar.up('grid').up('container').add(Ext.widget('noticeSearchWindow')).show();
 }, submitSearchForm:function(btn) {
   var store = Ext.data.StoreManager.lookup('noticeGridStore');
   var win = btn.up('window');
   var form = win.down('form');
   var values = form.getValues();
-  Ext.apply(store.proxy.extraParams, {noticeNumber:'', createTimeStart:'', createTimeEnd:''});
+  Ext.apply(store.proxy.extraParams, {noticeNumber:'', title:'', type:'', userId:'', createTimeStart:'', createTimeEnd:''});
   Ext.apply(store.proxy.extraParams, {noticeNumber:values.noticeNumber, createTimeStart:Ext.util.Format.date(values.createTimeStart, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(values.createTimeEnd, 'Y/m/d')});
   store.load({params:{start:0, limit:20, page:1}});
   win.close();
@@ -84182,16 +84175,137 @@ Ext.define('Admin.view.notice.NoticeViewController', {extend:Ext.app.ViewControl
 }});
 Ext.define('Admin.view.notice.NoticeViewModel', {extend:Ext.app.ViewModel, alias:'viewmodel.noticeViewModel', stores:{noticeLists:{type:'noticeGridStore'}}});
 Ext.define('Admin.view.salary.Salary', {extend:Ext.container.Container, xtype:'salary', controller:'salaryViewController', viewModel:{type:'salaryViewModel'}, layout:'fit', items:[{xtype:'salaryPanel'}]});
-Ext.define('Admin.view.salary.SalaryPanel', {extend:Ext.panel.Panel, xtype:'salaryPanel', layout:'fit', items:[{xtype:'gridpanel', cls:'user-grid', title:'薪酬管理模块', bind:'{salaryLists}', scrollable:false, columns:[{xtype:'gridcolumn', width:40, dataIndex:'identifier', text:'#'}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'user_name', text:'员工姓名', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'user_id', text:'员工id', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'department', 
-text:'员工部门', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'position', text:'员工职位', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'basesalary', text:'基本工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'meritpay', text:'绩效工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'monthlysalary', text:'月度工资', flex:1}, {xtype:'datecolumn', cls:'content-column', width:120, dataIndex:'date', text:'日期', formatter:'date("Y/m/d")'}, {xtype:'actioncolumn', 
-cls:'content-column', width:120, dataIndex:'bool', text:'Actions', tooltip:'edit ', items:[{xtype:'button', iconCls:'x-fa fa-edit', handler:'onEditButton'}, {xtype:'button', iconCls:'x-fa fa-close', handler:'onDeleteButton'}, {xtype:'button', iconCls:'x-fa fa-ban', handler:'onDisableButton'}]}], dockedItems:[{xtype:'pagingtoolbar', dock:'bottom', itemId:'userPaginationToolbar', displayInfo:true, bind:'{salaryLists}'}]}]});
-Ext.define('Admin.view.salary.SalaryViewController', {extend:Ext.app.ViewController, alias:'controller.salaryViewController', onEditButton:function(grid, rowIndex, colIndex) {
-  var rec = grid.getStore().getAt(rowIndex);
-  Ext.Msg.alert('Title', rec.get('user_name'));
-}, onDeleteButton:function(grid, rowIndex, colIndex) {
-  Ext.Msg.alert('Title', 'Click Delete Button');
+Ext.define('Aria.view.salary.SalaryAddWindow', {extend:Ext.window.Window, alias:'widget.salaryAddWindow', minHeight:100, minWidth:300, scrollable:true, title:'新增员工薪酬信息', closable:true, constrain:true, defaultFocus:'textfield', modal:true, layout:'fit', items:[{xtype:'form', layout:'form', padding:'10px', ariaLabel:'Enter salary message', items:[{xtype:'textfield', fieldLabel:'id', name:'id', hidden:true, readOnly:true}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'textfield', fieldLabel:'员工姓名', 
+name:'userName'}, {xtype:'textfield', fieldLabel:'员工部门', name:'department'}, {xtype:'textfield', fieldLabel:'员工职位', name:'position'}, {xtype:'textfield', fieldLabel:'基本工资', name:'baseSalary'}, {xtype:'textfield', fieldLabel:'绩效工资', name:'meritPay'}, {xtype:'textfield', fieldLabel:'月度工资', name:'monthlySalary'}, {xtype:'datefield', fieldLabel:'创建日期', name:'createTime', format:'Y/m/d'}]}], buttonAlign:'center', buttons:{dock:'bottom', items:[{xtype:'button', text:'提交', handler:'submitAddForm'}, {xtype:'button', 
+text:'重置', handler:function(btn) {
+  btn.up('window').down('form').reset();
+}}, {xtype:'button', text:'关闭', handler:function(btn) {
+  btn.up('window').close();
+}}]}});
+Ext.define('Aria.view.salary.SalaryEditWindow', {extend:Ext.window.Window, alias:'widget.salaryEditWindow', minHeight:100, minWidth:300, scrollable:true, title:'修改员工薪酬信息', closable:true, constrain:true, defaultFocus:'textfield', modal:true, layout:'fit', items:[{xtype:'form', layout:'form', padding:'10px', ariaLabel:'Enter salary message', items:[{xtype:'textfield', fieldLabel:'id', name:'id', hidden:true, readOnly:true}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'textfield', 
+fieldLabel:'员工姓名', name:'userName'}, {xtype:'textfield', fieldLabel:'员工部门', name:'department'}, {xtype:'textfield', fieldLabel:'员工职位', name:'position'}, {xtype:'textfield', fieldLabel:'基本工资', name:'baseSalary'}, {xtype:'textfield', fieldLabel:'绩效工资', name:'meritPay'}, {xtype:'textfield', fieldLabel:'月度工资', name:'monthlySalary'}, {xtype:'datefield', fieldLabel:'创建日期', name:'createTime', format:'Y/m/d'}]}], buttonAlign:'center', buttons:{dock:'bottom', items:[{xtype:'button', text:'提交', handler:'submitEditForm'}, 
+{xtype:'button', text:'重置', handler:function(btn) {
+  btn.up('window').down('form').reset();
+}}, {xtype:'button', text:'关闭', handler:function(btn) {
+  btn.up('window').close();
+}}]}});
+Ext.define('Admin.view.salary.SalaryPanel', {extend:Ext.panel.Panel, xtype:'salaryPanel', layout:'fit', items:[{xtype:'gridpanel', cls:'user-grid', title:'薪酬管理模块', bind:'{salaryLists}', scrollable:false, selModel:{type:'checkboxmodel', checkOnly:true}, columns:[{xtype:'gridcolumn', width:40, dataIndex:'id', text:'Key', hidden:true}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'userId', text:'员工编号', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'userName', text:'员工姓名', flex:1}, 
+{xtype:'gridcolumn', cls:'content-column', dataIndex:'department', text:'员工部门', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'position', text:'员工职位', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'baseSalary', text:'基本工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'meritPay', text:'绩效工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'monthlySalary', text:'月度工资', flex:1}, {xtype:'datecolumn', cls:'content-column', width:120, dataIndex:'createTime', 
+text:'创建日期', formatter:'date("Y/m/d")'}, {xtype:'actioncolumn', cls:'content-column', width:120, dataIndex:'bool', text:'操作', tooltip:'edit ', items:[{xtype:'button', iconCls:'x-fa fa-edit', handler:'openEditWindow'}, {xtype:'button', iconCls:'x-fa fa-close', handler:'deleteOneRow'}, {xtype:'button', iconCls:'x-fa fa-ban', handler:'onDisableButton'}]}], tbar:[{xtype:'combobox', reference:'searchFieldName', hideLabel:true, store:Ext.create('Ext.data.Store', {fields:['name', 'value'], data:[{name:'员工编号', 
+value:'userId'}, {name:'员工姓名', value:'userName'}, {name:'员工部门', value:'department'}, {name:'创建日期', value:'createTime'}]}), displayField:'name', valueField:'value', value:'userId', editable:false, queryMode:'local', triggerAction:'all', emptyText:'Select a state...', width:135, listeners:{select:'searchComboboxSelectChuang'}}, '-', {xtype:'textfield', reference:'searchFieldValue', name:'salaryPanelSearchField'}, '-', {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue', 
+fieldLabel:'From', name:'from_date'}, {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue2', fieldLabel:'To', name:'to_date'}, '-', {text:'Search', iconCls:'fa fa-search', handler:'quickSearch'}, '-', {text:'Search More', iconCls:'fa fa-search-plus', handler:'openSearchWindow'}, '-\x3e', {text:'Add', tooltip:'Add a new row', iconCls:'fa fa-plus', handler:'openAddWindow'}, '-', {text:'Removes', iconCls:'fa fa-trash', itemId:'salaryGridPanelRemove', disabled:true, 
+handler:'deleteMoreRows'}], listeners:{selectionchange:function(selModel, selections) {
+  this.down('#salaryGridPanelRemove').setDisabled(selections.length === 0);
+}}, dockedItems:[{xtype:'pagingtoolbar', dock:'bottom', itemId:'userPaginationToolbar', displayInfo:true, bind:'{salaryLists}'}]}]});
+Ext.define('Aria.view.salary.SalarySearchWindow', {extend:Ext.window.Window, alias:'widget.salarySearchWindow', minHeight:100, minWidth:300, scrollable:true, title:'高级查询', closable:true, constrain:true, defaultFocus:'textfield', modal:true, layout:'fit', items:[{xtype:'form', layout:'form', padding:'10px', ariaLabel:'Enter salary message', items:[{xtype:'textfield', fieldLabel:'id', name:'id', hidden:true, readOnly:true}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'textfield', 
+fieldLabel:'员工姓名', name:'userName'}, {xtype:'textfield', fieldLabel:'员工部门', name:'department'}, {xtype:'textfield', fieldLabel:'员工职位', name:'position'}, {xtype:'datefield', fieldLabel:'创建日期', name:'createTime', format:'Y/m/d'}]}], buttonAlign:'center', buttons:{dock:'bottom', items:[{xtype:'button', text:'提交', handler:'submitSearchForm'}, {xtype:'button', text:'重置', handler:function(btn) {
+  btn.up('window').down('form').reset();
+}}, {xtype:'button', text:'关闭', handler:function(btn) {
+  btn.up('window').close();
+}}]}});
+Ext.define('Admin.view.salary.SalaryViewController', {extend:Ext.app.ViewController, alias:'controller.salaryViewController', openAddWindow:function(toolbar, rowIndex, colIndex) {
+  toolbar.up('panel').up('container').add(Ext.widget('salaryAddWindow')).show();
+}, submitAddForm:function(btn) {
+  var win = btn.up('window');
+  var form = win.down('form');
+  var record = Ext.create('Admin.model.salary.SalaryModel');
+  var values = form.getValues();
+  record.set(values);
+  record.save();
+  Ext.data.StoreManager.lookup('salaryGridStore').load();
+  win.close();
+}, openEditWindow:function(grid, rowIndex, colIndex) {
+  var record = grid.getStore().getAt(rowIndex);
+  if (record) {
+    var win = grid.up('container').add(Ext.widget('salaryEditWindow'));
+    win.show();
+    win.down('form').getForm().loadRecord(record);
+  }
+}, submitEditForm:function(btn) {
+  var win = btn.up('window');
+  var store = Ext.data.StoreManager.lookup('salaryGridStore');
+  var values = win.down('form').getValues();
+  var record = store.getById(values.id);
+  record.set(values);
+  win.close();
+}, quickSearch:function(btn) {
+  var searchField = this.lookupReference('searchFieldName').getValue();
+  var searchValue = this.lookupReference('searchFieldValue').getValue();
+  var searchDataFieldValue = this.lookupReference('searchDataFieldValue').getValue();
+  var searchDataFieldValue2 = this.lookupReference('searchDataFieldValue2').getValue();
+  var store = btn.up('gridpanel').getStore();
+  Ext.apply(store.proxy.extraParams, {userId:'', userName:'', department:'', position:'', baseSalary:'', meritPay:'', monthlySalary:'', createTime:''});
+  if (searchField === 'userId') {
+    Ext.apply(store.proxy.extraParams, {userId:searchValue});
+  }
+  if (searchField === 'userName') {
+    Ext.apply(store.proxy.extraParams, {userName:searchValue});
+  }
+  if (searchField === 'department') {
+    Ext.apply(store.proxy.extraParams, {department:searchValue});
+  }
+  if (searchField === 'createTime') {
+    Ext.apply(store.proxy.extraParams, {createTimeStart:Ext.util.Format.date(searchDataFieldValue, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(searchDataFieldValue2, 'Y/m/d')});
+  }
+  store.load({params:{start:0, limit:20, page:1}});
+}, openSearchWindow:function(toolbar, rowIndex, colIndex) {
+  toolbar.up('grid').up('container').add(Ext.widget('salarySearchWindow')).show();
+}, submitSearchForm:function(btn) {
+  var store = Ext.data.StoreManager.lookup('salaryGridStore');
+  var win = btn.up('window');
+  var form = win.down('form');
+  var values = form.getValues();
+  Ext.apply(store.proxy.extraParams, {userId:'', userName:'', department:'', position:'', baseSalary:'', meritPay:'', monthlySalary:'', createTime:''});
+  Ext.apply(store.proxy.extraParams, {salaryNumber:values.salaryNumber, createTimeStart:Ext.util.Format.date(values.createTimeStart, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(values.createTimeEnd, 'Y/m/d')});
+  store.load({params:{start:0, limit:20, page:1}});
+  win.close();
+}, deleteOneRow:function(grid, rowIndex, colIndex) {
+  Ext.MessageBox.confirm('提示', '确定要进行删除操作吗？数据将无法还原！', function(btn, text) {
+    if (btn == 'yes') {
+      var store = grid.getStore();
+      var record = store.getAt(rowIndex);
+      store.remove(record);
+    }
+  }, this);
+}, deleteMoreRows:function(btn, rowIndex, colIndex) {
+  var grid = btn.up('gridpanel');
+  var selModel = grid.getSelectionModel();
+  if (selModel.hasSelection()) {
+    Ext.Msg.confirm('警告', '确定要删除吗？', function(button) {
+      if (button == 'yes') {
+        var rows = selModel.getSelection();
+        var selectIds = [];
+        Ext.each(rows, function(row) {
+          selectIds.push(row.data.id);
+        });
+        Ext.Ajax.request({url:'/salary/deletes', method:'post', params:{ids:selectIds}, success:function(response, options) {
+          var json = Ext.util.JSON.decode(response.responseText);
+          if (json.success) {
+            Ext.Msg.alert('操作成功', json.msg, function() {
+              grid.getStore().reload();
+            });
+          } else {
+            Ext.Msg.alert('操作失败', json.msg);
+          }
+        }});
+      }
+    });
+  } else {
+    Ext.Msg.alert('错误', '没有任何行被选中，无法进行删除操作！');
+  }
 }, onDisableButton:function(grid, rowIndex, colIndex) {
   Ext.Msg.alert('Title', 'Click Disable Button');
+}, searchComboboxSelectChuang:function(combo, record, index) {
+  var searchField = this.lookupReference('searchFieldName').getValue();
+  if (searchField === 'createTime') {
+    this.lookupReference('searchFieldValue').hide();
+    this.lookupReference('searchDataFieldValue').show();
+    this.lookupReference('searchDataFieldValue2').show();
+  } else {
+    this.lookupReference('searchFieldValue').show();
+    this.lookupReference('searchDataFieldValue').hide();
+    this.lookupReference('searchDataFieldValue2').hide();
+  }
 }});
-Ext.define('Admin.view.salary.SalaryViewModel', {extend:Ext.app.ViewModel, alias:'viewmodel.salaryViewModel', stores:{salaryLists:{type:'salaryGridStroe'}}});
+Ext.define('Admin.view.salary.SalaryViewModel', {extend:Ext.app.ViewModel, alias:'viewmodel.salaryViewModel', stores:{salaryLists:{type:'salaryGridStore'}}});
 Ext.application({extend:Admin.Application, name:'Admin', mainView:'Admin.view.main.Main'});
