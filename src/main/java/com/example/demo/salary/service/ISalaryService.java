@@ -1,5 +1,6 @@
 package com.example.demo.salary.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -17,5 +18,5 @@ public interface ISalaryService {
 	public void deleteById(Long id);
 	public void deleteAll(Long[] ids);
 	public Page<Salary> findAll(Specification<Salary> spec, Pageable pageable);
-
+	public List<Salary> findAll();
 }

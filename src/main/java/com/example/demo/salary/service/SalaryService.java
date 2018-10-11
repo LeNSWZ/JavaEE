@@ -63,4 +63,10 @@ public class SalaryService implements ISalaryService {
 		return salaryRepository.findAll(spec, pageable);
 	}
 
+	@Override
+	public List<Salary> findAll() {
+		return (List<Salary>) salaryRepository.findAll();
+	}
+	
+	
 }
