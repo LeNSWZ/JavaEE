@@ -84121,8 +84121,8 @@ Ext.define('Admin.view.notice.NoticeViewController', {extend:Ext.app.ViewControl
   var win = btn.up('window');
   var form = win.down('form');
   var values = form.getValues();
-  Ext.apply(store.proxy.extraParams, {noticeNumber:'', title:'', type:'', userId:'', createTimeStart:'', createTimeEnd:''});
-  Ext.apply(store.proxy.extraParams, {noticeNumber:values.noticeNumber, createTimeStart:Ext.util.Format.date(values.createTimeStart, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(values.createTimeEnd, 'Y/m/d')});
+  Ext.apply(store.proxy.extraParams, {noticeNumber:'', title:'', type:'', userId:'', createTime:'', createTimeStart:'', createTimeEnd:''});
+  Ext.apply(store.proxy.extraParams, {noticeNumber:values.noticeNumber, title:values.title, type:values.type, userId:values.userId, createTime:Ext.util.Format.date(values.createTime, 'Y/m/d'), createTimeStart:Ext.util.Format.date(values.createTimeStart, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(values.createTimeEnd, 'Y/m/d')});
   store.load({params:{start:0, limit:20, page:1}});
   win.close();
 }, deleteOneRow:function(grid, rowIndex, colIndex) {
@@ -84192,9 +84192,9 @@ fieldLabel:'员工姓名', name:'userName'}, {xtype:'textfield', fieldLabel:'员
 Ext.define('Admin.view.salary.SalaryPanel', {extend:Ext.panel.Panel, xtype:'salaryPanel', layout:'fit', items:[{xtype:'gridpanel', cls:'user-grid', title:'薪酬管理模块', bind:'{salaryLists}', scrollable:false, selModel:{type:'checkboxmodel', checkOnly:true}, columns:[{xtype:'gridcolumn', width:40, dataIndex:'id', text:'Key', hidden:true}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'userId', text:'员工编号', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'userName', text:'员工姓名', flex:1}, 
 {xtype:'gridcolumn', cls:'content-column', dataIndex:'department', text:'员工部门', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'position', text:'员工职位', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'baseSalary', text:'基本工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'meritPay', text:'绩效工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'monthlySalary', text:'月度工资', flex:1}, {xtype:'datecolumn', cls:'content-column', width:120, dataIndex:'createTime', 
 text:'创建日期', formatter:'date("Y/m/d")'}, {xtype:'actioncolumn', cls:'content-column', width:120, dataIndex:'bool', text:'操作', tooltip:'edit ', items:[{xtype:'button', iconCls:'x-fa fa-edit', handler:'openEditWindow'}, {xtype:'button', iconCls:'x-fa fa-close', handler:'deleteOneRow'}, {xtype:'button', iconCls:'x-fa fa-ban', handler:'onDisableButton'}]}], tbar:[{xtype:'combobox', reference:'searchFieldName', hideLabel:true, store:Ext.create('Ext.data.Store', {fields:['name', 'value'], data:[{name:'员工编号', 
-value:'userId'}, {name:'员工姓名', value:'userName'}, {name:'员工部门', value:'department'}, {name:'创建日期', value:'createTime'}]}), displayField:'name', valueField:'value', value:'userId', editable:false, queryMode:'local', triggerAction:'all', emptyText:'Select a state...', width:135, listeners:{select:'searchComboboxSelectChuang'}}, '-', {xtype:'textfield', reference:'searchFieldValue', name:'salaryPanelSearchField'}, '-', {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue', 
-fieldLabel:'From', name:'from_date'}, {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue2', fieldLabel:'To', name:'to_date'}, '-', {text:'Search', iconCls:'fa fa-search', handler:'quickSearch'}, '-', {text:'Search More', iconCls:'fa fa-search-plus', handler:'openSearchWindow'}, '-\x3e', {text:'Add', tooltip:'Add a new row', iconCls:'fa fa-plus', handler:'openAddWindow'}, '-', {text:'Removes', iconCls:'fa fa-trash', itemId:'salaryGridPanelRemove', disabled:true, 
-handler:'deleteMoreRows'}], listeners:{selectionchange:function(selModel, selections) {
+value:'userId'}, {name:'员工姓名', value:'userName'}, {name:'员工部门', value:'department'}, {name:'员工职位', value:'position'}, {name:'创建日期', value:'createTime'}]}), displayField:'name', valueField:'value', value:'userId', editable:false, queryMode:'local', triggerAction:'all', emptyText:'Select a state...', width:135, listeners:{select:'searchComboboxSelectChuang'}}, '-', {xtype:'textfield', reference:'searchFieldValue', name:'salaryPanelSearchField'}, '-', {xtype:'datefield', hideLabel:true, hidden:true, 
+format:'Y/m/d', reference:'searchDataFieldValue', fieldLabel:'From', name:'from_date'}, {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue2', fieldLabel:'To', name:'to_date'}, '-', {text:'Search', iconCls:'fa fa-search', handler:'quickSearch'}, '-', {text:'Search More', iconCls:'fa fa-search-plus', handler:'openSearchWindow'}, '-\x3e', {text:'Add', tooltip:'Add a new row', iconCls:'fa fa-plus', handler:'openAddWindow'}, '-', {text:'Removes', iconCls:'fa fa-trash', 
+itemId:'salaryGridPanelRemove', disabled:true, handler:'deleteMoreRows'}], listeners:{selectionchange:function(selModel, selections) {
   this.down('#salaryGridPanelRemove').setDisabled(selections.length === 0);
 }}, dockedItems:[{xtype:'pagingtoolbar', dock:'bottom', itemId:'userPaginationToolbar', displayInfo:true, bind:'{salaryLists}'}]}]});
 Ext.define('Aria.view.salary.SalarySearchWindow', {extend:Ext.window.Window, alias:'widget.salarySearchWindow', minHeight:100, minWidth:300, scrollable:true, title:'高级查询', closable:true, constrain:true, defaultFocus:'textfield', modal:true, layout:'fit', items:[{xtype:'form', layout:'form', padding:'10px', ariaLabel:'Enter salary message', items:[{xtype:'textfield', fieldLabel:'id', name:'id', hidden:true, readOnly:true}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'textfield', 
@@ -84213,6 +84213,7 @@ Ext.define('Admin.view.salary.SalaryViewController', {extend:Ext.app.ViewControl
   record.set(values);
   record.save();
   Ext.data.StoreManager.lookup('salaryGridStore').load();
+  store.load();
   win.close();
 }, openEditWindow:function(grid, rowIndex, colIndex) {
   var record = grid.getStore().getAt(rowIndex);
@@ -84244,6 +84245,9 @@ Ext.define('Admin.view.salary.SalaryViewController', {extend:Ext.app.ViewControl
   if (searchField === 'department') {
     Ext.apply(store.proxy.extraParams, {department:searchValue});
   }
+  if (searchField === 'position') {
+    Ext.apply(store.proxy.extraParams, {position:searchValue});
+  }
   if (searchField === 'createTime') {
     Ext.apply(store.proxy.extraParams, {createTimeStart:Ext.util.Format.date(searchDataFieldValue, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(searchDataFieldValue2, 'Y/m/d')});
   }
@@ -84256,7 +84260,7 @@ Ext.define('Admin.view.salary.SalaryViewController', {extend:Ext.app.ViewControl
   var form = win.down('form');
   var values = form.getValues();
   Ext.apply(store.proxy.extraParams, {userId:'', userName:'', department:'', position:'', baseSalary:'', meritPay:'', monthlySalary:'', createTime:''});
-  Ext.apply(store.proxy.extraParams, {salaryNumber:values.salaryNumber, createTimeStart:Ext.util.Format.date(values.createTimeStart, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(values.createTimeEnd, 'Y/m/d')});
+  Ext.apply(store.proxy.extraParams, {userId:values.userId, userName:values.userName, department:values.department, position:values.position, createTime:Ext.util.Format.date(values.createTime, 'Y/m/d'), createTimeStart:Ext.util.Format.date(values.createTimeStart, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(values.createTimeEnd, 'Y/m/d')});
   store.load({params:{start:0, limit:20, page:1}});
   win.close();
 }, deleteOneRow:function(grid, rowIndex, colIndex) {

@@ -126,6 +126,10 @@ public class SalaryQueryDTO {
 					predicate.add(criteriaBuilder.like(root.get("department").as(String.class),
 							"%" + salaryQueryDTO.getDepartment() + "%"));
 				}
+				if (StringUtils.isNotBlank(salaryQueryDTO.getPosition())) {
+					predicate.add(criteriaBuilder.like(root.get("position").as(String.class),
+							"%" + salaryQueryDTO.getPosition() + "%"));
+				}
 				if (null!=salaryQueryDTO.getCreateTimeStart()) {
 					predicate.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createTime").as(Date.class),
 							salaryQueryDTO.getCreateTimeStart()));
