@@ -10,17 +10,37 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
+
 @Entity
 @Table(name="t_salary")
 public class Salary {
+	
+	@Excel(name = "id" ,orderNum = "0")
 	private Long id;
+	
+	@Excel(name = "员工姓名" ,orderNum = "2")
 	private String userName;
+	
+	@Excel(name = "员工编号" ,orderNum = "1")
 	private String userId;
+	
+	@Excel(name = "员工部门" ,orderNum = "3")
 	private String department;
+	
+	@Excel(name = "员工职位" ,orderNum = "4")
 	private String position;
+	
+	@Excel(name = "基本工资" ,orderNum = "5")
 	private String baseSalary;
+	
+	@Excel(name = "绩效工资" ,orderNum = "6")
 	private String meritPay;
+	
+	@Excel(name = "月度工资" ,orderNum = "7")
 	private String monthlySalary;
+	
+	@Excel(name = "创建日期" ,orderNum = "8",importFormat = "yyyy-MM-dd")
 	private Date createTime;
 	
 	@Id

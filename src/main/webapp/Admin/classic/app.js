@@ -83921,7 +83921,7 @@ Ext.define('Admin.model.Base', {extend:Ext.data.Model, schema:{namespace:'Admin.
 Ext.define('Admin.model.notice.NoticeModel', {extend:Admin.model.Base, fields:[{type:'int', name:'id'}, {type:'string', name:'noticeNumber'}, {type:'string', name:'title'}, {type:'string', name:'type'}, {type:'string', name:'content'}, {type:'string', name:'userId'}, {type:'date', name:'createTime', dateFormat:'Y/m/d'}], proxy:{type:'rest', url:'/notice'}});
 Ext.define('Admin.model.salary.SalaryModel', {extend:Admin.model.Base, fields:[{type:'int', name:'id'}, {type:'string', name:'userId'}, {type:'string', name:'userName'}, {type:'string', name:'department'}, {type:'string', name:'position'}, {type:'string', name:'baseSalary'}, {type:'string', name:'meritPay'}, {type:'string', name:'monthlySalary'}, {type:'date', name:'createTime', dateFormat:'Y/m/d'}], proxy:{type:'rest', url:'/salary'}});
 Ext.define('Admin.store.NavigationTree', {extend:Ext.data.TreeStore, storeId:'NavigationTree', fields:[{name:'text'}], root:{expanded:true, children:[{text:'Dashboard', iconCls:'x-fa fa-desktop', rowCls:'nav-tree-badge nav-tree-badge-new', viewType:'admindashboard', routeId:'dashboard', leaf:true}, {text:'订单管理模块', iconCls:'x-fa fa-address-card', viewType:'order', leaf:true}, {text:'公告管理模块', iconCls:'x-fa fa-newspaper-o', viewType:'notice', leaf:true}, {text:'新闻公告', iconCls:'x-fa  fa-newspaper-o', 
-viewType:'news', leaf:true}, {text:'薪酬管理模块', iconCls:'x-fa  fa-paw', children:[{text:'薪酬管理', iconCls:'x-fa  fa-paw', viewType:'salary', leaf:true}, {text:'查询薪酬', iconCls:'x-fa  fa-paw', viewType:'checksalary', leaf:true}]}]}});
+viewType:'showNotice', leaf:true}, {text:'薪酬管理模块', iconCls:'x-fa  fa-paw', children:[{text:'薪酬管理', iconCls:'x-fa  fa-paw', viewType:'salary', leaf:true}, {text:'查询薪酬', iconCls:'x-fa  fa-paw', viewType:'checkSalary', leaf:true}]}]}});
 Ext.define('Admin.store.notice.NoticeGridStore', {extend:Ext.data.Store, storeId:'noticeGridStore', alias:'store.noticeGridStore', model:'Admin.model.notice.NoticeModel', proxy:{type:'rest', url:'/notice', reader:{type:'json', rootProperty:'content', totalPoperty:'totalElements'}, writer:{type:'json'}, simpleSortMode:true}, autoLoad:true, autoSync:true, remoteSort:true, pageSize:20, sorters:{direction:'DESC', property:'id'}});
 Ext.define('Admin.store.salary.SalaryGridStore', {extend:Ext.data.Store, storeId:'salaryGridStore', alias:'store.salaryGridStore', model:'Admin.model.salary.SalaryModel', proxy:{type:'rest', url:'/salary', reader:{type:'json', rootProperty:'content', totalPoperty:'totalElements'}, writer:{type:'json'}, simpleSortMode:true}, autoLoad:true, autoSync:true, remoteSort:true, pageSize:20, sorters:{direction:'DESC', property:'id'}});
 Ext.define('Admin.view.dashboard.DashboardController', {extend:Ext.app.ViewController, alias:'controller.dashboard', onRefreshToggle:function(tool, e, owner) {
@@ -83962,6 +83962,65 @@ Ext.define('Admin.Application', {extend:Ext.app.Application, name:'Admin', store
     }
   });
 }});
+Ext.define('Admin.view.checksalary.CheckSalary', {extend:Ext.container.Container, xtype:'checkSalary', controller:'checkSalaryViewController', viewModel:{type:'checkSalaryViewModel'}, layout:'fit', items:[{xtype:'checkSalaryPanel'}]});
+Ext.define('Admin.view.checksalary.CheckSalaryPanel', {extend:Ext.panel.Panel, xtype:'checkSalaryPanel', layout:'fit', items:[{xtype:'gridpanel', cls:'user-grid', title:'查询薪酬模块', bind:'{salaryLists}', scrollable:false, selModel:{type:'checkboxmodel', checkOnly:true}, columns:[{xtype:'gridcolumn', width:40, dataIndex:'id', text:'Key', hidden:true}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'userId', text:'员工编号', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'userName', text:'员工姓名', 
+flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'department', text:'员工部门', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'position', text:'员工职位', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'baseSalary', text:'基本工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'meritPay', text:'绩效工资', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'monthlySalary', text:'月度工资', flex:1}, {xtype:'datecolumn', cls:'content-column', width:120, 
+dataIndex:'createTime', text:'创建日期', formatter:'date("Y/m/d")'}], tbar:[{xtype:'combobox', reference:'searchFieldName', hideLabel:true, store:Ext.create('Ext.data.Store', {fields:['name', 'value'], data:[{name:'员工编号', value:'userId'}, {name:'员工姓名', value:'userName'}, {name:'员工部门', value:'department'}, {name:'员工职位', value:'position'}, {name:'创建日期', value:'createTime'}]}), displayField:'name', valueField:'value', value:'userId', editable:false, queryMode:'local', triggerAction:'all', emptyText:'Select a state...', 
+width:135, listeners:{select:'searchComboboxSelectChuang'}}, '-', {xtype:'textfield', reference:'searchFieldValue', name:'salaryPanelSearchField'}, '-', {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue', fieldLabel:'From', name:'from_date'}, {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue2', fieldLabel:'To', name:'to_date'}, '-', {text:'Search', iconCls:'fa fa-search', handler:'quickSearch'}, '-', {text:'Search More', 
+iconCls:'fa fa-search-plus', handler:'openSearchWindow'}], dockedItems:[{xtype:'pagingtoolbar', dock:'bottom', itemId:'userPaginationToolbar', displayInfo:true, bind:'{salaryLists}'}]}]});
+Ext.define('Aria.view.checksalary.CheckSalarySearchWindow', {extend:Ext.window.Window, alias:'widget.checkSalarySearchWindow', minHeight:100, minWidth:300, scrollable:true, title:'高级查询', closable:true, constrain:true, defaultFocus:'textfield', modal:true, layout:'fit', items:[{xtype:'form', layout:'form', padding:'10px', ariaLabel:'Enter salary message', items:[{xtype:'textfield', fieldLabel:'id', name:'id', hidden:true, readOnly:true}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'textfield', 
+fieldLabel:'员工姓名', name:'userName'}, {xtype:'textfield', fieldLabel:'员工部门', name:'department'}, {xtype:'textfield', fieldLabel:'员工职位', name:'position'}, {xtype:'datefield', fieldLabel:'创建日期', name:'createTime', format:'Y/m/d'}]}], buttonAlign:'center', buttons:{dock:'bottom', items:[{xtype:'button', text:'提交', handler:'submitSearchForm'}, {xtype:'button', text:'重置', handler:function(btn) {
+  btn.up('window').down('form').reset();
+}}, {xtype:'button', text:'关闭', handler:function(btn) {
+  btn.up('window').close();
+}}]}});
+Ext.define('Admin.view.checksalary.CheckSalaryViewController', {extend:Ext.app.ViewController, alias:'controller.checkSalaryViewController', quickSearch:function(btn) {
+  var searchField = this.lookupReference('searchFieldName').getValue();
+  var searchValue = this.lookupReference('searchFieldValue').getValue();
+  var searchDataFieldValue = this.lookupReference('searchDataFieldValue').getValue();
+  var searchDataFieldValue2 = this.lookupReference('searchDataFieldValue2').getValue();
+  var store = btn.up('gridpanel').getStore();
+  Ext.apply(store.proxy.extraParams, {userId:'', userName:'', department:'', position:'', baseSalary:'', meritPay:'', monthlySalary:'', createTime:''});
+  if (searchField === 'userId') {
+    Ext.apply(store.proxy.extraParams, {userId:searchValue});
+  }
+  if (searchField === 'userName') {
+    Ext.apply(store.proxy.extraParams, {userName:searchValue});
+  }
+  if (searchField === 'department') {
+    Ext.apply(store.proxy.extraParams, {department:searchValue});
+  }
+  if (searchField === 'position') {
+    Ext.apply(store.proxy.extraParams, {position:searchValue});
+  }
+  if (searchField === 'createTime') {
+    Ext.apply(store.proxy.extraParams, {createTimeStart:Ext.util.Format.date(searchDataFieldValue, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(searchDataFieldValue2, 'Y/m/d')});
+  }
+  store.load({params:{start:0, limit:20, page:1}});
+}, openSearchWindow:function(toolbar, rowIndex, colIndex) {
+  toolbar.up('grid').up('container').add(Ext.widget('checkSalarySearchWindow')).show();
+}, submitSearchForm:function(btn) {
+  var store = Ext.data.StoreManager.lookup('salaryGridStore');
+  var win = btn.up('window');
+  var form = win.down('form');
+  var values = form.getValues();
+  Ext.apply(store.proxy.extraParams, {userId:'', userName:'', department:'', position:'', baseSalary:'', meritPay:'', monthlySalary:'', createTime:''});
+  Ext.apply(store.proxy.extraParams, {userId:values.userId, userName:values.userName, department:values.department, position:values.position, createTime:Ext.util.Format.date(values.createTime, 'Y/m/d'), createTimeStart:Ext.util.Format.date(values.createTimeStart, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(values.createTimeEnd, 'Y/m/d')});
+  store.load({params:{start:0, limit:20, page:1}});
+  win.close();
+}, searchComboboxSelectChuang:function(combo, record, index) {
+  var searchField = this.lookupReference('searchFieldName').getValue();
+  if (searchField === 'createTime') {
+    this.lookupReference('searchFieldValue').hide();
+    this.lookupReference('searchDataFieldValue').show();
+    this.lookupReference('searchDataFieldValue2').show();
+  } else {
+    this.lookupReference('searchFieldValue').show();
+    this.lookupReference('searchDataFieldValue').hide();
+    this.lookupReference('searchDataFieldValue2').hide();
+  }
+}});
+Ext.define('Admin.view.checksalary.CheckSalaryViewModel', {extend:Ext.app.ViewModel, alias:'viewmodel.checkSalaryViewModel', stores:{salaryLists:{type:'salaryGridStore'}}});
 Ext.define('Admin.view.dashboard.Dashboard', {extend:Ext.container.Container, xtype:'admindashboard', controller:'dashboard', viewModel:{type:'dashboard'}, layout:'responsivecolumn', listeners:{hide:'onHideView'}, html:'admindashboard'});
 Ext.define('Admin.view.main.MainContainerWrap', {extend:Ext.container.Container, xtype:'maincontainerwrap', scrollable:'y', layout:{type:'hbox', align:'stretchmax', animate:true, animatePolicy:{x:true, width:true}}, beforeLayout:function() {
   var me = this, height = Ext.Element.getViewportHeight() - 64, navTree = me.getComponent('navigationTreeList');
@@ -84051,16 +84110,16 @@ items:[{xtype:'button', text:'提交', handler:'submitEditForm'}, {xtype:'button
 }}, {xtype:'button', text:'关闭', handler:function(btn) {
   btn.up('window').close();
 }}]}});
-Ext.define('Admin.view.notice.NoticePanel', {extend:Ext.panel.Panel, xtype:'noticePanel', layout:'fit', items:[{xtype:'gridpanel', cls:'user-grid', title:'公告管理模块', bind:'{noticeLists}', scrollable:false, selModel:{type:'checkboxmodel', checkOnly:true}, columns:[{xtype:'gridcolumn', width:40, dataIndex:'id', text:'Id', text:'Key', hidden:true}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'noticeNumber', text:'公告编号', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'title', text:'公告标题', 
-flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'content', text:'公告内容', flex:1, hidden:true}, {xtype:'datecolumn', cls:'content-column', width:120, dataIndex:'createTime', text:'创建时间', formatter:'date("Y/m/d")'}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'userId', text:'员工编号', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'type', text:'公告类型', flex:1}, {xtype:'actioncolumn', cls:'content-column', width:150, dataIndex:'bool', text:'操作', tooltip:'edit ', items:[{xtype:'button', 
-iconCls:'x-fa fa-edit', handler:'openEditWindow'}, {xtype:'button', iconCls:'x-fa fa-window-close-o', handler:'deleteOneRow'}, {xtype:'button', iconCls:'x-fa fa-minus-square', handler:'onDisableButton'}, {xtype:'button', iconCls:'x-fa fa-caret-square-o-right', handler:'onDisableButton'}]}], tbar:[{xtype:'combobox', reference:'searchFieldName', hideLabel:true, store:Ext.create('Ext.data.Store', {fields:['name', 'value'], data:[{name:'公告编号', value:'noticeNumber'}, {name:'公告标题', value:'title'}, {name:'员工编号', 
-value:'userId'}, {name:'创建时间', value:'createTime'}, {name:'公告类型', value:'type'}]}), displayField:'name', valueField:'value', value:'noticeNumber', editable:false, queryMode:'local', triggerAction:'all', emptyText:'Select a state...', width:135, listeners:{select:'searchComboboxSelectChuang'}}, '-', {xtype:'textfield', reference:'searchFieldValue', name:'noticePanelSearchField'}, '-', {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue', fieldLabel:'From', 
-name:'from_date'}, {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue2', fieldLabel:'To', name:'to_date'}, '-', {text:'Search', iconCls:'fa fa-search', handler:'quickSearch'}, '-', {text:'Search More', iconCls:'fa fa-search-plus', handler:'openSearchWindow'}, '-\x3e', {text:'Add', tooltip:'Add a new row', iconCls:'fa fa-plus', handler:'openAddWindow'}, '-', {text:'Removes', iconCls:'fa fa-trash', itemId:'noticeGridPanelRemove', disabled:true, handler:'deleteMoreRows'}], 
-listeners:{selectionchange:function(selModel, selections) {
+Ext.define('Admin.view.notice.NoticePanel', {extend:Ext.panel.Panel, xtype:'noticePanel', layout:'fit', items:[{xtype:'gridpanel', cls:'user-grid', title:'公告管理模块', bind:'{noticeLists}', scrollable:false, selModel:{type:'checkboxmodel', checkOnly:true}, columns:[{xtype:'gridcolumn', width:40, dataIndex:'id', text:'Id', text:'Key', hidden:true}, {xtype:'gridcolumn', cls:'content-column', width:100, dataIndex:'noticeNumber', text:'公告编号'}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'title', 
+text:'公告标题', flex:1}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'content', text:'公告内容', flex:1, hidden:true}, {xtype:'datecolumn', cls:'content-column', width:100, dataIndex:'createTime', text:'创建时间', formatter:'date("Y/m/d")'}, {xtype:'gridcolumn', cls:'content-column', width:100, dataIndex:'userId', text:'员工编号'}, {xtype:'gridcolumn', cls:'content-column', width:100, dataIndex:'type', text:'公告类型'}, {xtype:'actioncolumn', cls:'content-column', width:150, dataIndex:'bool', text:'操作', tooltip:'edit ', 
+items:[{xtype:'button', iconCls:'x-fa fa-edit', handler:'openEditWindow'}, {xtype:'button', iconCls:'x-fa fa-window-close-o', handler:'deleteOneRow'}, {xtype:'button', iconCls:'x-fa fa-minus-square', handler:'onDisableButton'}, {xtype:'button', iconCls:'x-fa fa-caret-square-o-right', handler:'onDisableButton'}]}], tbar:[{xtype:'combobox', reference:'searchFieldName', hideLabel:true, store:Ext.create('Ext.data.Store', {fields:['name', 'value'], data:[{name:'公告编号', value:'noticeNumber'}, {name:'公告标题', 
+value:'title'}, {name:'员工编号', value:'userId'}, {name:'创建时间', value:'createTime'}, {name:'公告类型', value:'type'}]}), displayField:'name', valueField:'value', value:'noticeNumber', editable:false, queryMode:'local', triggerAction:'all', emptyText:'Select a state...', width:135, listeners:{select:'searchComboboxSelectChuang'}}, '-', {xtype:'textfield', reference:'searchFieldValue', name:'noticePanelSearchField'}, '-', {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue', 
+fieldLabel:'From', name:'from_date'}, {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue2', fieldLabel:'To', name:'to_date'}, '-', {text:'Search', iconCls:'fa fa-search', handler:'quickSearch'}, '-', {text:'Search More', iconCls:'fa fa-search-plus', handler:'openSearchWindow'}, '-\x3e', {text:'Add', tooltip:'Add a new row', iconCls:'fa fa-plus', handler:'openAddWindow'}, '-', {text:'Removes', iconCls:'fa fa-trash', itemId:'noticeGridPanelRemove', disabled:true, 
+handler:'deleteMoreRows'}], listeners:{selectionchange:function(selModel, selections) {
   this.down('#noticeGridPanelRemove').setDisabled(selections.length === 0);
 }}, dockedItems:[{xtype:'pagingtoolbar', dock:'bottom', itemId:'userPaginationToolbar', displayInfo:true, bind:'{noticeLists}'}]}]});
 Ext.define('Aria.view.notice.NoticeSearchWindow', {extend:Ext.window.Window, alias:'widget.noticeSearchWindow', minHeight:100, minWidth:300, scrollable:true, title:'查询公告', closable:true, constrain:true, defaultFocus:'textfield', modal:true, layout:'fit', items:[{xtype:'form', layout:'form', padding:'10px', ariaLabel:'Enter notice message', items:[{xtype:'textfield', fieldLabel:'id', name:'id', hidden:true, readOnly:true}, {xtype:'textfield', fieldLabel:'公告编号', name:'noticeNumber'}, {xtype:'textfield', 
-fieldLabel:'公告标题', name:'title'}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'datefield', fieldLabel:'Create Time', name:'createTime', format:'Y/m/d'}, {xtype:'radiogroup', fieldLabel:'类型', name:'type', hideLabels:false, layout:'hbox', items:[{boxLabel:'新闻\x26nbsp\x26nbsp\x26nbsp\x26nbsp', name:'type', inputValue:'news', checked:true}, {boxLabel:'通知', name:'type', inputValue:'notice'}]}]}], buttonAlign:'center', buttons:{dock:'bottom', items:[{xtype:'button', text:'提交', handler:'submitSearchForm'}, 
+fieldLabel:'公告标题', name:'title'}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'datefield', fieldLabel:'创建时间', name:'createTime', format:'Y/m/d'}, {xtype:'radiogroup', fieldLabel:'类型', name:'type', hideLabels:false, layout:'hbox', items:[{boxLabel:'新闻\x26nbsp\x26nbsp\x26nbsp\x26nbsp', name:'type', inputValue:'news', checked:true}, {boxLabel:'通知', name:'type', inputValue:'notice'}]}]}], buttonAlign:'center', buttons:{dock:'bottom', items:[{xtype:'button', text:'提交', handler:'submitSearchForm'}, 
 {xtype:'button', text:'重置', handler:function(btn) {
   btn.up('window').down('form').reset();
 }}, {xtype:'button', text:'关闭', handler:function(btn) {
@@ -84194,7 +84253,7 @@ Ext.define('Admin.view.salary.SalaryPanel', {extend:Ext.panel.Panel, xtype:'sala
 text:'创建日期', formatter:'date("Y/m/d")'}, {xtype:'actioncolumn', cls:'content-column', width:120, dataIndex:'bool', text:'操作', tooltip:'edit ', items:[{xtype:'button', iconCls:'x-fa fa-edit', handler:'openEditWindow'}, {xtype:'button', iconCls:'x-fa fa-close', handler:'deleteOneRow'}, {xtype:'button', iconCls:'x-fa fa-ban', handler:'onDisableButton'}]}], tbar:[{xtype:'combobox', reference:'searchFieldName', hideLabel:true, store:Ext.create('Ext.data.Store', {fields:['name', 'value'], data:[{name:'员工编号', 
 value:'userId'}, {name:'员工姓名', value:'userName'}, {name:'员工部门', value:'department'}, {name:'员工职位', value:'position'}, {name:'创建日期', value:'createTime'}]}), displayField:'name', valueField:'value', value:'userId', editable:false, queryMode:'local', triggerAction:'all', emptyText:'Select a state...', width:135, listeners:{select:'searchComboboxSelectChuang'}}, '-', {xtype:'textfield', reference:'searchFieldValue', name:'salaryPanelSearchField'}, '-', {xtype:'datefield', hideLabel:true, hidden:true, 
 format:'Y/m/d', reference:'searchDataFieldValue', fieldLabel:'From', name:'from_date'}, {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue2', fieldLabel:'To', name:'to_date'}, '-', {text:'Search', iconCls:'fa fa-search', handler:'quickSearch'}, '-', {text:'Search More', iconCls:'fa fa-search-plus', handler:'openSearchWindow'}, '-\x3e', {text:'Add', tooltip:'Add a new row', iconCls:'fa fa-plus', handler:'openAddWindow'}, '-', {text:'Removes', iconCls:'fa fa-trash', 
-itemId:'salaryGridPanelRemove', disabled:true, handler:'deleteMoreRows'}, '-', {text:'Download', iconCls:'fa fa-download', handler:'downloadExcel'}], listeners:{selectionchange:function(selModel, selections) {
+itemId:'salaryGridPanelRemove', disabled:true, handler:'deleteMoreRows'}, '-', {text:'Upload', iconCls:'fa fa-upload', handler:'uploadExcel'}, '-', {text:'Download', iconCls:'fa fa-download', handler:'downloadExcel'}], listeners:{selectionchange:function(selModel, selections) {
   this.down('#salaryGridPanelRemove').setDisabled(selections.length === 0);
 }}, dockedItems:[{xtype:'pagingtoolbar', dock:'bottom', itemId:'userPaginationToolbar', displayInfo:true, bind:'{salaryLists}'}]}]});
 Ext.define('Aria.view.salary.SalarySearchWindow', {extend:Ext.window.Window, alias:'widget.salarySearchWindow', minHeight:100, minWidth:300, scrollable:true, title:'高级查询', closable:true, constrain:true, defaultFocus:'textfield', modal:true, layout:'fit', items:[{xtype:'form', layout:'form', padding:'10px', ariaLabel:'Enter salary message', items:[{xtype:'textfield', fieldLabel:'id', name:'id', hidden:true, readOnly:true}, {xtype:'textfield', fieldLabel:'员工编号', name:'userId'}, {xtype:'textfield', 
@@ -84301,6 +84360,8 @@ Ext.define('Admin.view.salary.SalaryViewController', {extend:Ext.app.ViewControl
   Ext.Msg.alert('提示', '成功下载员工薪酬表');
   var url = '/salary/excel/getSalary';
   window.open(url);
+}, uploadExcel:function(btn) {
+  Ext.Msg.alert('提示', '成功上传员工薪酬表');
 }, onDisableButton:function(grid, rowIndex, colIndex) {
   Ext.Msg.alert('Title', 'Click Disable Button');
 }, searchComboboxSelectChuang:function(combo, record, index) {
@@ -84316,4 +84377,56 @@ Ext.define('Admin.view.salary.SalaryViewController', {extend:Ext.app.ViewControl
   }
 }});
 Ext.define('Admin.view.salary.SalaryViewModel', {extend:Ext.app.ViewModel, alias:'viewmodel.salaryViewModel', stores:{salaryLists:{type:'salaryGridStore'}}});
+Ext.define('Admin.view.shownotice.ShowNotice', {extend:Ext.container.Container, xtype:'showNotice', controller:'showNoticeViewController', viewModel:{type:'showNoticeViewModel'}, layout:'fit', items:[{xtype:'showNoticePanel'}]});
+Ext.define('Admin.view.shownotice.ShowNoticePanel', {extend:Ext.panel.Panel, xtype:'showNoticePanel', layout:'fit', items:[{xtype:'gridpanel', cls:'user-grid', title:'查询薪酬模块', bind:'{noticeLists}', scrollable:false, selModel:{type:'checkboxmodel', checkOnly:true}, columns:[{xtype:'gridcolumn', width:40, dataIndex:'id', text:'Id', text:'Key', hidden:true}, {xtype:'gridcolumn', cls:'content-column', width:100, dataIndex:'noticeNumber', text:'公告编号'}, {xtype:'gridcolumn', cls:'content-column', dataIndex:'title', 
+text:'公告标题', flex:1}, {xtype:'datecolumn', cls:'content-column', width:100, dataIndex:'createTime', text:'创建时间', formatter:'date("Y/m/d")'}, {xtype:'gridcolumn', cls:'content-column', width:100, dataIndex:'type', text:'公告类型'}, {xtype:'actioncolumn', cls:'content-column', width:50, dataIndex:'bool', text:'操作', tooltip:'edit ', items:[{xtype:'button', iconCls:'x-fa fa-caret-square-o-right', handler:'onDisableButton'}]}], tbar:[{xtype:'combobox', reference:'searchFieldName', hideLabel:true, store:Ext.create('Ext.data.Store', 
+{fields:['name', 'value'], data:[{name:'公告编号', value:'noticeNumber'}, {name:'创建时间', value:'createTime'}, {name:'公告类型', value:'type'}]}), displayField:'name', valueField:'value', value:'noticeNumber', editable:false, queryMode:'local', triggerAction:'all', emptyText:'Select a state...', width:135, listeners:{select:'searchComboboxSelectChuang'}}, '-', {xtype:'textfield', reference:'searchFieldValue', name:'noticePanelSearchField'}, '-', {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', 
+reference:'searchDataFieldValue', fieldLabel:'From', name:'from_date'}, {xtype:'datefield', hideLabel:true, hidden:true, format:'Y/m/d', reference:'searchDataFieldValue2', fieldLabel:'To', name:'to_date'}, '-', {text:'Search', iconCls:'fa fa-search', handler:'quickSearch'}, '-', {text:'Search More', iconCls:'fa fa-search-plus', handler:'openSearchWindow'}], dockedItems:[{xtype:'pagingtoolbar', dock:'bottom', itemId:'userPaginationToolbar', displayInfo:true, bind:'{noticeLists}'}]}]});
+Ext.define('Aria.view.shownotice.ShowNoticeSearchWindow', {extend:Ext.window.Window, alias:'widget.showNoticeSearchWindow', minHeight:100, minWidth:300, scrollable:true, title:'高级查询', closable:true, constrain:true, defaultFocus:'textfield', modal:true, layout:'fit', items:[{xtype:'form', layout:'form', padding:'10px', ariaLabel:'Enter salary message', items:[{xtype:'textfield', fieldLabel:'id', name:'id', hidden:true, readOnly:true}, {xtype:'textfield', fieldLabel:'公告编号', name:'noticeNumber'}, {xtype:'datefield', 
+fieldLabel:'创建时间', name:'createTime', format:'Y/m/d'}, {xtype:'radiogroup', fieldLabel:'类型', name:'type', hideLabels:false, layout:'hbox', items:[{boxLabel:'新闻\x26nbsp\x26nbsp\x26nbsp\x26nbsp', name:'type', inputValue:'news', checked:true}, {boxLabel:'通知', name:'type', inputValue:'notice'}]}]}], buttonAlign:'center', buttons:{dock:'bottom', items:[{xtype:'button', text:'提交', handler:'submitSearchForm'}, {xtype:'button', text:'重置', handler:function(btn) {
+  btn.up('window').down('form').reset();
+}}, {xtype:'button', text:'关闭', handler:function(btn) {
+  btn.up('window').close();
+}}]}});
+Ext.define('Admin.view.shownotice.ShowNoticeViewController', {extend:Ext.app.ViewController, alias:'controller.showNoticeViewController', quickSearch:function(btn) {
+  var searchField = this.lookupReference('searchFieldName').getValue();
+  var searchValue = this.lookupReference('searchFieldValue').getValue();
+  var searchDataFieldValue = this.lookupReference('searchDataFieldValue').getValue();
+  var searchDataFieldValue2 = this.lookupReference('searchDataFieldValue2').getValue();
+  var store = btn.up('gridpanel').getStore();
+  Ext.apply(store.proxy.extraParams, {noticeNumber:'', title:'', type:'', userId:'', createTimeStart:'', createTimeEnd:''});
+  if (searchField === 'noticeNumber') {
+    Ext.apply(store.proxy.extraParams, {noticeNumber:searchValue});
+  }
+  if (searchField === 'type') {
+    Ext.apply(store.proxy.extraParams, {type:searchValue});
+  }
+  if (searchField === 'createTime') {
+    Ext.apply(store.proxy.extraParams, {createTimeStart:Ext.util.Format.date(searchDataFieldValue, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(searchDataFieldValue2, 'Y/m/d')});
+  }
+  store.load({params:{start:0, limit:20, page:1}});
+}, openSearchWindow:function(toolbar, rowIndex, colIndex) {
+  toolbar.up('grid').up('container').add(Ext.widget('showNoticeSearchWindow')).show();
+}, submitSearchForm:function(btn) {
+  var store = Ext.data.StoreManager.lookup('noticeGridStore');
+  var win = btn.up('window');
+  var form = win.down('form');
+  var values = form.getValues();
+  Ext.apply(store.proxy.extraParams, {noticeNumber:'', title:'', type:'', userId:'', createTime:'', createTimeStart:'', createTimeEnd:''});
+  Ext.apply(store.proxy.extraParams, {noticeNumber:values.noticeNumber, type:values.type, createTime:Ext.util.Format.date(values.createTime, 'Y/m/d'), createTimeStart:Ext.util.Format.date(values.createTimeStart, 'Y/m/d'), createTimeEnd:Ext.util.Format.date(values.createTimeEnd, 'Y/m/d')});
+  store.load({params:{start:0, limit:20, page:1}});
+  win.close();
+}, searchComboboxSelectChuang:function(combo, record, index) {
+  var searchField = this.lookupReference('searchFieldName').getValue();
+  if (searchField === 'createTime') {
+    this.lookupReference('searchFieldValue').hide();
+    this.lookupReference('searchDataFieldValue').show();
+    this.lookupReference('searchDataFieldValue2').show();
+  } else {
+    this.lookupReference('searchFieldValue').show();
+    this.lookupReference('searchDataFieldValue').hide();
+    this.lookupReference('searchDataFieldValue2').hide();
+  }
+}});
+Ext.define('Admin.view.shownotice.ShowNoticeViewModel', {extend:Ext.app.ViewModel, alias:'viewmodel.showNoticeViewModel', stores:{noticeLists:{type:'noticeGridStore'}}});
 Ext.application({extend:Admin.Application, name:'Admin', mainView:'Admin.view.main.Main'});
