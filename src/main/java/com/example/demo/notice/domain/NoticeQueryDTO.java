@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Lob;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -25,9 +26,12 @@ public class NoticeQueryDTO{
 	
 	private String type;
 	
+	@Lob
 	private String content;
 	
 	private String userId;
+	
+	private String department;
 	
 	@DateTimeFormat(pattern="yyyy/MM/dd")  
 	private Date createTimeStart;
@@ -96,6 +100,14 @@ public class NoticeQueryDTO{
 		this.createTimeEnd = createTimeEnd;
 	}
 	
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+	
 	@SuppressWarnings({ "serial"})
 	public static Specification<Notice> getWhereClause(final NoticeQueryDTO noticeQueryDTO) {
 		return new Specification<Notice>() {
@@ -119,6 +131,10 @@ public class NoticeQueryDTO{
 					predicate.add(criteriaBuilder.like(root.get("userId").as(String.class),
 							"%" + noticeQueryDTO.getUserId() + "%"));
 				}
+				if (StringUtils.isNotBlank(noticeQueryDTO.getDepartment())) {
+					predicate.add(criteriaBuilder.like(root.get("department").as(String.class),
+							"%" + noticeQueryDTO.getDepartment() + "%"));
+				}
 				if (null!=noticeQueryDTO.getCreateTimeStart()) {
 					predicate.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createTime").as(Date.class),
 							noticeQueryDTO.getCreateTimeStart()));
@@ -133,4 +149,6 @@ public class NoticeQueryDTO{
 			}
 		};
 	}
+
+
 }

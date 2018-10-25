@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -19,6 +20,7 @@ public class Notice {
 	private String type;
 	private String content;
 	private String userId;
+	private String department;
 	private Date createTime;
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -46,6 +48,7 @@ public class Notice {
 	public void setType(String type) {
 		this.type = type;
 	}
+	@Lob
 	public String getContent() {
 		return content;
 	}
@@ -64,5 +67,11 @@ public class Notice {
 	}
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+	public String getDepartment() {
+		return department;
+	}
+	public void setDepartment(String department) {
+		this.department = department;
 	}	
 }
